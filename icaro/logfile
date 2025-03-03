@@ -1,0 +1,42 @@
+2025-03-01 17:18:27.779 CET [4295] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:18:27.781 CET [4295] LOG:  could not bind IPv6 address "::1": Address already in use
+2025-03-01 17:18:27.781 CET [4295] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2025-03-01 17:18:27.781 CET [4295] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2025-03-01 17:18:27.781 CET [4295] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2025-03-01 17:18:27.781 CET [4295] WARNING:  could not create listen socket for "localhost"
+2025-03-01 17:18:27.781 CET [4295] FATAL:  could not create any TCP/IP sockets
+2025-03-01 17:18:27.781 CET [4295] LOG:  database system is shut down
+2025-03-01 17:19:51.954 CET [4537] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:19:51.959 CET [4537] LOG:  could not bind IPv6 address "::1": Address already in use
+2025-03-01 17:19:51.959 CET [4537] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2025-03-01 17:19:51.959 CET [4537] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2025-03-01 17:19:51.959 CET [4537] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2025-03-01 17:19:51.959 CET [4537] WARNING:  could not create listen socket for "localhost"
+2025-03-01 17:19:51.959 CET [4537] FATAL:  could not create any TCP/IP sockets
+2025-03-01 17:19:51.960 CET [4537] LOG:  database system is shut down
+2025-03-01 17:21:27.490 CET [5036] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:21:27.495 CET [5036] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-01 17:21:27.495 CET [5036] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-01 17:21:27.495 CET [5036] FATAL:  could not open lock file "/tmp/.s.PGSQL.5432.lock": Permission denied
+2025-03-01 17:21:27.495 CET [5036] LOG:  database system is shut down
+2025-03-01 17:22:59.801 CET [5390] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:22:59.805 CET [5390] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-01 17:22:59.805 CET [5390] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-01 17:22:59.805 CET [5390] FATAL:  could not open lock file "/tmp/.s.PGSQL.5432.lock": Permission denied
+2025-03-01 17:22:59.806 CET [5390] LOG:  database system is shut down
+2025-03-01 17:24:12.002 CET [5759] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:24:12.007 CET [5759] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-01 17:24:12.007 CET [5759] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-01 17:24:12.007 CET [5759] FATAL:  could not open lock file "/tmp/.s.PGSQL.5432.lock": Permission denied
+2025-03-01 17:24:12.008 CET [5759] LOG:  database system is shut down
+2025-03-01 17:24:49.554 CET [5941] LOG:  starting PostgreSQL 14.17 (Homebrew) on aarch64-apple-darwin24.2.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.6), 64-bit
+2025-03-01 17:24:49.559 CET [5941] LOG:  listening on IPv6 address "::1", port 5432
+2025-03-01 17:24:49.559 CET [5941] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-03-01 17:24:49.560 CET [5941] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-03-01 17:24:49.562 CET [5942] LOG:  database system was shut down at 2025-03-01 17:17:36 CET
+2025-03-01 17:24:49.565 CET [5941] LOG:  database system is ready to accept connections
+2025-03-01 17:25:41.243 CET [5941] LOG:  received fast shutdown request
+2025-03-01 17:25:41.247 CET [5941] LOG:  aborting any active transactions
+2025-03-01 17:25:41.249 CET [5941] LOG:  background worker "logical replication launcher" (PID 5948) exited with exit code 1
+2025-03-01 17:25:41.249 CET [5943] LOG:  shutting down
+2025-03-01 17:25:41.256 CET [5941] LOG:  database system is shut down

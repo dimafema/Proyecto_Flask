@@ -1,0 +1,29 @@
+{% extends 'base.html'%}
+
+{% block content %}
+    <h2>{% block title %} Registro {%endblock%}</h2>
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+           <div class="card">
+               <div class="card-body">
+                <h4 class="card-title">Rol</h4>
+                <p class="card-text">Por favor, rellene los siguientes campos para crear el rol en la aplicación</p>
+                    <div class="card-body">
+                        <form action="" method="POST">
+                            <div class="mb-3">
+                                <label for="rolname" class="form-label">Roles de usuario</label>
+                                <input type="text" class="form-control" id="rolname" name="rolname" required minlength="4" maxlength="20" placeholder="Roles de usuario">
+                            </div>
+                            <div class="mb-3">
+                                <label for="roldescription" class="form-label">Descripción</label>
+                                <input type="text" class="form-control" id="roldescription" name="roldescription" placeholder="descripción">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Crear</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}           

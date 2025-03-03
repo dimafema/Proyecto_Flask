@@ -1,0 +1,25 @@
+<!-- filepath: /Volumes/SD_externa/Proyecto_Flask/icaro/icaroapp/templates/icaro/listniveles.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin: 50px;">
+    <section class="container-fluid">
+        <nav class="navbar">
+             <h2>{% block title %} Lista de dificultad para preguntas{%endblock%}</h2>
+             <a href="{{url_for('icaro.createnivel')}}" class="btn btn-success">Crear nivel</a>
+        </nav>
+    </section>
+    <div class="container">
+        <h1>Niveles</h1>
+        <ul class="list-group">
+            {% for nivel in niveles %}
+            <li class="list-group-item">
+                {{ nivel.nivel_name }} - {{ nivel.nivel_description }}
+                <a href="{{ url_for('icaro.editnivel', id=nivel.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{{ url_for('icaro.deletenivel', id=nivel.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

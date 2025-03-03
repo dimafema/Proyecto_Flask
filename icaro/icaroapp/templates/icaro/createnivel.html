@@ -1,0 +1,28 @@
+<!-- filepath: /Volumes/SD_externa/Proyecto_Flask/icaro/icaroapp/templates/icaro/createnivel.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Crear Nivel</h1>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="nivel_name" class="form-label">Nombre del Nivel</label>
+                <input type="text" class="form-control" id="nivel_name" name="nivel_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="nivel_description" class="form-label">Descripción del Nivel</label>
+                <textarea class="form-control" id="nivel_description" name="nivel_description" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="resource_id">Recurso Asociado</label>
+                    <select class="form-control" id="resource_id" name="resource_id" required>
+                        <option value="">Seleccione un recurso</option>
+                        {% for resource in resources %}
+                            <option value="{{ resource.id }}">{{ resource.resource_name }}: {{resource.resource_description}}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Crear Nivel</button>
+        </form>
+    </div>
+{% endblock %}

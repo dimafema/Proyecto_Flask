@@ -1,0 +1,26 @@
+{% extends 'base.html'%}
+{%block head%}
+<link href="{{url_for('static', filename = 'css/product.css')}}" rel="stylesheet">
+{%endblock%}
+
+{% block content %}
+    <main class="form-signin w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <div class="col-sm-8">
+            <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
+            <p class="h6 mb-3 fw-normal">Por favor, rellene los siguientes campos para acreditarse</p>
+            <div class="form-group">
+                <form action="" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" required placeholder="Nombre de usuario">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Contraseña">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Inicio</button>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}     

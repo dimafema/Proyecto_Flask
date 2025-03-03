@@ -1,0 +1,30 @@
+<!-- filepath: /Volumes/SD_externa/Proyecto_Flask/icaro/icaroapp/templates/icaro/quiz_results.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Resultados de tus intentos</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Intento</th>
+                    <th>Fecha</th>
+                    <th>Aciertos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attempt in user_quizzes | groupby("attempt_id") %}
+                <tr>
+                    <td>{{ attempt.grouper }}</td>
+                    <td>{{ attempt.list[0].user_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ attempt.list | sum(attribute='user_score') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

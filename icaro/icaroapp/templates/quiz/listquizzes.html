@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+   <div style="margin: 50px;">
+        <section class="container-fluid">
+            <nav class="navbar">
+                 <h3>{% block title %}Listado de preguntas cargadas en el sistema{% endblock %}</h3>
+            </nav>
+        </section>
+
+        <div class="row justify-content-end">
+            <form method="GET" action="{{ url_for('icaro.listquizzes') }}">
+                <label for="per_page">Mostrar</label>
+                <select name="per_page" id="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="5" {% if per_page == 5 %}selected{% endif %}>5</option>
+                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                    <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                </select>
+                <input type="hidden" name="page" value="1">
+            </form>
+        </div>
+
+        <section class="row justify-content-center">
+            <div class="row justify-content-center">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="col">Título del Grupo</th>
+                            <th class="col">Pregunta</th>
+                            <th class="col">Respuesta Correcta</th>
+                            <th class="col">Grupo</th>
+                            <th class="col">Campo</th>
+                            <th class="col">Recurso</th>
+                            <th class="col">Nivel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if quizzes|length == 0 %}
+                            <p>No hay preguntas registradas aún.</p>
+                        {% endif %}
+                        {% for quiz in quizzes %}
+                            <tr>
+                                <td>{{ quiz.ask_title_group }}</td>
+                                <td>{{ quiz.ask_name }}</td>
+                                <td>{{ quiz.correct_answer }}</td>
+                                <td>{{ quiz.group_id }}</td>
+                                <td>{{ quiz.field_id }}</td>
+                                <td>{{ quiz.resource_id }}</td>
+                                <td>{{ quiz.nivel_id }}</td>
+                                <td>
+                                    <a href="{{ url_for('icaro.editquiz', id=quiz.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="{{ url_for('icaro.deletequiz', id=quiz.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Paginación -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if quizzes_pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('icaro.listquizzes', page=quizzes_pagination.prev_num, per_page=per_page) }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                {% for num in quizzes_pagination.iter_pages() %}
+                    {% if num %}
+                        <li class="page-item {% if num == quizzes_pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('icaro.listquizzes', page=num, per_page=per_page) }}">{{ num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if quizzes_pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('icaro.listquizzes', page=quizzes_pagination.next_num, per_page=per_page) }}">Siguiente</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+{% endblock %}

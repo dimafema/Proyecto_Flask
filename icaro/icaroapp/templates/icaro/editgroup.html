@@ -1,0 +1,28 @@
+
+{% extends 'base.html'%}
+
+{% block content %}
+    <h2>{% block title %} Editar {%endblock%}</h2>
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+           <div class="card">
+               <div class="card-body">
+                <h4 class="card-title">Grupo</h4>
+                <p class="card-text">Por favor, rellene los siguientes campos para crear grupo de colectivos de aprendizaje (ej. Bomberos, Policías, etc.)</p>
+                    <div class="card-body">
+                        <form method="POST">
+                            <label for="group_name">Nombre del grupo:</label><br>
+                            <input type="text" id="group_name" name="group_name" value="{{group.group_name}}"><br>
+                            <label for="group_description">Descripción:</label><br>
+                            <textarea id="group_description" name="group_description" style="width: 100%;">{{group.group_description}}</textarea><br><br>
+                            <input type="submit" value="Guardar">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}      
+
+
+
+

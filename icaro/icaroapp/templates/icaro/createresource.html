@@ -1,0 +1,39 @@
+{% extends 'base.html'%}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/product.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <main class="form-signin w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <div class="col-sm-8">
+            <h1 class="h3 mb-3 fw-normal">Crear Recurso</h1>
+            <p class="h6 mb-3 fw-normal">Por favor, rellene los siguientes campos para crear un nuevo recurso</p>
+            <div class="form-group">
+                <form action="" method="POST">
+                    <div class="mb-3">
+                        <label for="resource_name" class="form-label">Nombre del recurso</label>
+                        <input type="text" class="form-control" id="resource_name" name="resource_name" required minlength="4" maxlength="50" placeholder="Nombre del recurso">
+                    </div>
+                    <div class="mb-3">
+                        <label for="resource_description" class="form-label">Descripción del recurso</label>
+                        <textarea class="form-control" id="resource_description" name="resource_description" required minlength="10" maxlength="500" placeholder="Descripción del recurso"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resource_url" class="form-label">URL del recurso</label>
+                        <input type="url" class="form-control" id="resource_url" name="resource_url" required placeholder="URL del recurso">
+                    </div>
+                    <div class="mb-3">
+                        <label for="field_id" class="form-label">Campo</label>
+                        <select class="form-select" id="field_id" name="field_id" required>
+                            {% for field in fields %}
+                                <option value="{{ field.id }}">{{ field.field_name }}: {{field.field_description}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Recurso</button>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}

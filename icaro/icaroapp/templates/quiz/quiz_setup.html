@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div style="padding: 100px;">
+        <h5>Bienvenido, debes comenzar seleccionando el tipo de test que deseas realizar, ¡VAMOS! elige el grupo</h5>
+        <form id="quizForm" method="GET" action="">
+            <!-- Selección de Grupo -->
+            <div class="mb-3">
+                <label for="groupSelect" class="form-label">Selecciona un Grupo</label>
+                <select id="groupSelect" name="group_id" class="form-select">
+                    <option value="">-- Selecciona un Grupo --</option>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.group_name }}: {{ group.group_description }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Selección de Campo -->
+            <div class="mb-3" id="fieldContainer" style="display: none;">
+                <label for="fieldSelect" class="form-label">Selecciona un Campo</label>
+                <select id="fieldSelect" name="field_id" class="form-select"></select>
+            </div>
+
+            <!-- Selección de Recurso -->
+            <div class="mb-3" id="resourceContainer" style="display: none;">
+                <label for="resourceSelect" class="form-label">Selecciona un Recurso</label>
+                <select id="resourceSelect" name="resource_id" class="form-select"></select>
+            </div>
+
+            <!-- Selección de Nivel -->
+            <div class="mb-3" id="nivelContainer" style="display: none;">
+                <label for="nivelSelect" class="form-label">Selecciona un Nivel</label>
+                <select id="nivelSelect" name="nivel_id" class="form-select"></select>
+            </div>
+
+            <!-- Selección de Cantidad de Preguntas -->
+            <div class="mb-3" id="questionCountContainer" style="display: none;">
+                <label for="questionCount" class="form-label">Cantidad de Preguntas</label>
+                <input type="number" id="questionCount" name="num_questions" class="form-control" min="1" value="5" required>
+            </div>
+
+            <!-- Botón para Iniciar el Quiz -->
+            <button id="startQuizBtn" type="submit" class="btn btn-primary mt-3" style="display: none;">Iniciar Evaluación</button>
+        </form>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const groupSelect = document.getElementById("groupSelect");
+                const fieldSelect = document.getElementById("fieldSelect");
+                const resourceSelect = document.getElementById("resourceSelect");
+                const nivelSelect = document.getElementById("nivelSelect");
+                const questionCountInput = document.getElementById("questionCount");
+
+                const fieldContainer = document.getElementById("fieldContainer");
+                const resourceContainer = document.getElementById("resourceContainer");
+                const nivelContainer = document.getElementById("nivelContainer");
+                const questionCountContainer = document.getElementById("questionCountContainer");
+                const startQuizBtn = document.getElementById("startQuizBtn");
+
+                // Obtener los campos al seleccionar un grupo
+                groupSelect.addEventListener("change", function () {
+                    let groupId = this.value;
+                    if (groupId) {
+                        fetch(`/icaro/get_fields/${groupId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                fieldSelect.innerHTML = '<option value="">-- Selecciona un Campo --</option>';
+                                data.fields.forEach(field => {
+                                    fieldSelect.innerHTML += `<option value="${field.id}">${field.name}: ${field.description}</option>`;
+                                });
+                                fieldContainer.style.display = "block";
+                            });
+                    } else {
+                        fieldContainer.style.display = "none";
+                        resourceContainer.style.display = "none";
+                        nivelContainer.style.display = "none";
+                        questionCountContainer.style.display = "none";
+                        startQuizBtn.style.display = "none";
+                    }
+                });
+
+                // Obtener los recursos al seleccionar un campo
+                fieldSelect.addEventListener("change", function () {
+                    let fieldId = this.value;
+                    if (fieldId) {
+                        fetch(`/icaro/get_resources/${fieldId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                resourceSelect.innerHTML = '<option value="">-- Selecciona un Recurso --</option>';
+                                data.resources.forEach(resource => {
+                                    resourceSelect.innerHTML += `<option value="${resource.id}">${resource.name}: ${resource.description}</option>`;
+                                });
+                                resourceContainer.style.display = "block";
+                            });
+                    } else {
+                        resourceContainer.style.display = "none";
+                        nivelContainer.style.display = "none";
+                        questionCountContainer.style.display = "none";
+                        startQuizBtn.style.display = "none";
+                    }
+                });
+
+                // Obtener los niveles al seleccionar un recurso
+                resourceSelect.addEventListener("change", function () {
+                    let resourceId = this.value;
+                    if (resourceId) {
+                        fetch(`/icaro/get_niveles/${resourceId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                nivelSelect.innerHTML = '<option value="">-- Selecciona un Nivel --</option>';
+                                data.niveles.forEach(nivel => {
+                                    nivelSelect.innerHTML += `<option value="${nivel.id}">${nivel.name}</option>`;
+                                });
+                                nivelContainer.style.display = "block";
+                            });
+                    } else {
+                        nivelContainer.style.display = "none";
+                        questionCountContainer.style.display = "none";
+                        startQuizBtn.style.display = "none";
+                    }
+                });
+
+                // Mostrar el campo de cantidad de preguntas cuando se selecciona un nivel
+                nivelSelect.addEventListener("change", function () {
+                    if (this.value) {
+                        questionCountContainer.style.display = "block";
+                        startQuizBtn.style.display = "block";
+                        updateFormAction();
+                    } else {
+                        questionCountContainer.style.display = "none";
+                        startQuizBtn.style.display = "none";
+                    }
+                });
+
+                // Actualizar la URL cuando cambia el número de preguntas
+                questionCountInput.addEventListener("input", updateFormAction);
+
+                function updateFormAction() {
+                    let resourceId = document.getElementById("resourceSelect").value;
+                    let nivelId = document.getElementById("nivelSelect").value;
+                    let numQuestions = document.getElementById("questionCount").value;
+                    document.getElementById("quizForm").action = `/icaro/quiz/${resourceId}/${nivelId}/${numQuestions}`;
+                }
+            });
+        </script>
+    </div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html'%}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/product.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <main class="form-signin w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <div class="col-sm-8">
+            <h1 class="h3 mb-3 fw-normal">Crear campo de conocimiento</h1>
+            <p class="h6 mb-3 fw-normal">Por favor, rellene los siguientes campos para crear un nuevo campo de conocimiento<br>
+                 o disciplina (ej. Específico, General, Administración, etc.)</p>
+            <div class="form-group">
+                <form action="" method="POST">
+                    <div class="mb-3">
+                        <label for="field_name" class="form-label">Nombre del campo</label>
+                        <input type="text" class="form-control" id="field_name" name="field_name" required minlength="4" maxlength="50" placeholder="Nombre del campo">
+                    </div>
+                    <div class="mb-3">
+                        <label for="field_description" class="form-label">Descripción del campo</label>
+                        <textarea class="form-control" id="field_description" name="field_description" required minlength="10" maxlength="500" placeholder="Descripción del campo"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="group_id" class="form-label">Seleccione un grupo grupo</label>
+                        <select class="form-select" id="group_id" name="group_id" required>
+                            {% for group in grupo %}
+                                <option value="{{ group.id }}">{{ group.group_name }}: {{group.group_description}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Campo</button>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}

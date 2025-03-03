@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin: 50px;">
+    <section class="container-fluid">
+        <nav class="navbar">
+            <h2>{% block title %} Lista de recursos {% endblock %}</h2>
+            <a href="{{ url_for('icaro.createresource') }}" class="btn btn-success">Crear recurso</a>
+        </nav>
+    </section>
+    
+    <section class="row justify-content-center">
+        <div class="row justify-content-center">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="col">Nombre del recurso</th>
+                        <th class="col">Descripción</th>
+                        <th class="col">Enlace</th>
+                        <th class="col">Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resource in resources %}
+                        <tr>
+                            <td>{{ resource.resource_name }}</td>
+                            <td>{{ resource.resource_description }}</td>
+                            <td>{{ resource.resource_url }}</td>
+                            <td>{{ resource.field_id }}</td>
+                            <td>
+                                <a href="{{ url_for('icaro.editresource', id=resource.id) }}" class="btn btn-info btn-sm">Editar</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('icaro.deleteresource', id=resource.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

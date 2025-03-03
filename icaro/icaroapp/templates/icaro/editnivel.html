@@ -1,0 +1,19 @@
+<!-- filepath: /Volumes/SD_externa/Proyecto_Flask/icaro/icaroapp/templates/icaro/editnivel.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Editar Nivel</h1>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="nivel_name" class="form-label">Nombre del Nivel</label>
+                <input type="text" class="form-control" id="nivel_name" name="nivel_name" value="{{ nivel.nivel_name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="nivel_description" class="form-label">Descripción del Nivel</label>
+                <textarea class="form-control" id="nivel_description" name="nivel_description" required>{{ nivel.nivel_description }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </form>
+    </div>
+{% endblock %}

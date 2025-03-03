@@ -1,0 +1,101 @@
+{% extends 'base.html'%}
+
+{% block content %}
+    <h2>{% block title %} Editar Pregunta {% endblock %}</h2>
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+           <div class="card">
+               <div class="card-body">
+                <h4 class="card-title">Editar Pregunta</h4>
+                <p class="card-text">Desde este formulario puedes editar la pregunta y sus opciones.</p>
+                    <div class="card-body">
+                        <form action="" method="POST">
+                            <div class="mb-3">
+                                <label for="ask_title_group" class="form-label">Título del Grupo</label>
+                                <input type="text" class="form-control" id="ask_title_group" name="ask_title_group" value="{{ quiz.ask_title_group }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ask_name" class="form-label">Pregunta</label>
+                                <input type="text" class="form-control" id="ask_name" name="ask_name" required value="{{ quiz.ask_name }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer1" class="form-label">Opción 1</label>
+                                <input type="text" class="form-control" id="answer1" name="answer1" required value="{{ quiz.answer1 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer2" class="form-label">Opción 2</label>
+                                <input type="text" class="form-control" id="answer2" name="answer2" required value="{{ quiz.answer2 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer3" class="form-label">Opción 3</label>
+                                <input type="text" class="form-control" id="answer3" name="answer3" value="{{ quiz.answer3 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer4" class="form-label">Opción 4</label>
+                                <input type="text" class="form-control" id="answer4" name="answer4" value="{{ quiz.answer4 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer5" class="form-label">Opción 5</label>
+                                <input type="text" class="form-control" id="answer5" name="answer5" value="{{ quiz.answer5 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer6" class="form-label">Opción 6</label>
+                                <input type="text" class="form-control" id="answer6" name="answer6" value="{{ quiz.answer6 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer7" class="form-label">Opción 7</label>
+                                <input type="text" class="form-control" id="answer7" name="answer7" value="{{ quiz.answer7 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="answer8" class="form-label">Opción 8</label>
+                                <input type="text" class="form-control" id="answer8" name="answer8" value="{{ quiz.answer8 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="correct_answer" class="form-label">Respuesta Correcta</label>
+                                <input type="text" class="form-control" id="correct_answer" name="correct_answer" required value="{{ quiz.correct_answer }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ask_points" class="form-label">Explicación</label>
+                                <input type="text" class="form-control" id="ask_points" name="ask_points" required value="{{ quiz.ask_description }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="rolid" class="form-label">Rol</label>
+                                <select class="form-select" id="groupid" name="group_id" required>
+                                    {% for group in groups %}
+                                        <option value="{{ group.id }}">{{ group.group_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldid" class="form-label">Campo</label>
+                                <select class="form-select" id="fieldid" name="field_id" required>
+                                    {% for field in fields %}
+                                        <option value="{{ field.id }}">{{ field.field_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for=resourcedid" class="form-label">Recurso</label>
+                                <select class="form-select" id=resourcedid" name="resource_id" required>
+                                    {% for resource in resources %}
+                                        <option value="{{ resource.id }}">{{ resource.resource_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for=nivelid" class="form-label">Nivel</label>
+                                <select class="form-select" id=nivelid" name="nivel_id" required>
+                                    {% for nivel in niveles %}
+                                        <option value="{{ nivel.id }}">{{ nivel.nivel_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            <a href="{{ url_for('icaro.listquizzes') }}" class="btn btn-secondary">Cancelar</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

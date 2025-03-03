@@ -1,0 +1,42 @@
+
+{% extends 'base.html'%}
+
+{% block content %}
+<div style="margin: 50px;">
+    <section class="<div class="container-fluid">
+        <nav class= "navbar">
+             <h2>{% block title %} Lista de usuarios {%endblock%}</h2>
+             <a href="{{url_for('auth.register')}}" class="btn btn-success">Crear usuario</a>
+    </section>
+    
+    <section class="row justify-content-center">
+        <div class="row justify-content-center">
+            <table class = "table">
+                <thead>
+                    <tr>
+                        <th class="col">Nombre de usuario</th>
+                        <th class="col">Correo electrónico</th>
+                        <th class="col">Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users | reverse %}
+                    
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.roll_id }}</td>
+                            <td>
+                                <a href="{{url_for('auth.edituser', id = user.id)}}" class="btn btn-info btn-sm">Editar</a>
+                            </td>
+                            <td>
+                                <a href="{{url_for('admin.deleteuser', id = user.id)}}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}    

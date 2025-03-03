@@ -1,0 +1,43 @@
+{% extends 'base.html'%}
+
+    {%block head%}
+                <link href="{{url_for('static', filename = 'css/product.css')}}" rel="stylesheet">
+    {%endblock%}
+
+{% block content %}
+    <main class="form-signin w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 60vh;">
+        <div class="col-sm-8">
+            <h1 class="h3 mb-3 fw-normal">Registro</h1>
+            <p class="h6 mb-3 fw-normal">Por favor, rellene los siguientes campos para acreditarse</p>
+            <div class="form-group">
+                <form action="" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" required minlength="4" maxlength="20" placeholder="Nombre de usuario">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="example@dominio.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="4" maxlength="40" placeholder="Contraseña">
+                    </div>
+                    {% if g.user.roll_id == 1 %}
+                        <div class="mb-3">
+                            <label for="rolid" class="form-label">Rol</label>
+                            <select class="form-select" id="rolid" name="roll_id" required>
+                                {% for role in roles %}
+                                    <option value="{{ role.id }}">{{ role.roll_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% else %}
+                        <input type="hidden" id="rolid" name="roll_id" value="5">
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">Registrarse</button>              
+                </form>            
+            </div>
+        </div>
+    </main>
+{% endblock %}           

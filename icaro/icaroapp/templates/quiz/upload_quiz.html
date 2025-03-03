@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h5>Cargar preguntas desde CSV</h5>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="file" class="form-label">Seleccione el archivo CSV</label>
+                <input class="form-control" type="file" id="file" name="file" accept=".csv" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cargar</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h5>Cargar preguntas desde Excel</h5>
+        <form action="{{ url_for('icaro.importquiz') }}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="excelFile" class="form-label">Sube un archivo Excel:</label>
+                <input type="file" class="form-control" name="file" id="excelFile" accept=".xlsx" required>
+            </div>
+            <button type="submit" class="btn btn-success">Importar desde Excel 📤</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h5>Cargar preguntas desde PDF</h5>
+        
+        <form action="{{ url_for('icaro.upload_pdf') }}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="pdfFile" class="form-label">Sube un archivo PDF:</label>
+                <input type="file" class="form-control" name="file" id="pdfFile" accept=".pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generar preguntas</button>
+        </form>
+    </div>
+{% endblock %}

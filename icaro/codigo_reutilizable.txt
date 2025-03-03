@@ -1,0 +1,74 @@
+@bp.route('/quiz/<int:resource_id>/<int:nivel_id>/<int:question_index>', methods=['GET', 'POST'])
+@login_required
+def start_quiz(resource_id, nivel_id, question_index=0):
+    questions = Quiz.query.filter_by(resource_id=resource_id, nivel_id=nivel_id).all()
+    if not questions:
+        flash("No hay preguntas disponibles para este grupo.")
+        return redirect(url_for('icaro.select_group'))
+
+    question = questions[question_index]
+    total_questions = len(questions)
+
+    # 📌 Generar attempt_id si es la primera pregunta del intento
+    if question_index == 0:
+        last_attempt = db.session.query(db.func.max(UserQuiz.attempt_id)).filter_by(user_id=g.user.id).scalar()
+        attempt_id = (last_attempt or 0) + 1
+        session['attempt_id'] = attempt_id  # Guardamos el attempt_id en la sesión
+    else:
+        attempt_id = session.get('attempt_id')
+
+
+    if request.method == 'POST':
+        user_answer = request.form.get('answer')
+        is_correct = (user_answer == question.correct_answer)
+
+        user_quiz = UserQuiz(
+            user_id=g.user.id,
+            quiz_id=question.id,
+            user_answer=user_answer,
+            user_score=1 if is_correct else 0,
+            user_date=datetime.utcnow(),
+            
+            attempt_id=attempt_id,
+        )
+        db.session.add(user_quiz)
+        db.session.commit()
+
+        if question_index + 1 < total_questions:
+            return redirect(url_for('icaro.start_quiz', resource_id=resource_id, nivel_id=nivel_id, question_index=question_index + 1))
+        else:
+            flash("¡Has completado la evaluación!")
+            return redirect(url_for('icaro.quiz_results'))
+
+    return render_template('quiz/quiz.html', question=question, question_index=question_index, total_questions=total_questions)
+
+
+
+
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+     <div class="container">
+        <h4>Intento N° {{ session['attempt_id'] }}</h4>
+        <h4>Pregunta {{ question_index + 1 }} de {{ total_questions }}</h4>
+        <p><strong>{{ question.ask_name }}</strong></p>
+
+        <form method="POST">
+            {% for answer in question.get_valid_answers() %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="answer" value="{{ answer }}" required>
+                    <label class="form-check-label">{{ answer }}</label>
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary mt-3">Responder</button>
+        </form>
+
+        {% if request.method == 'POST' and not is_correct %}
+            <p class="text-danger mt-3">Respuesta incorrecta. <strong>Explicación:</strong> {{ question.ask_description }}</p>
+        {% endif %}
+   </div>
+{% endblock %}
+

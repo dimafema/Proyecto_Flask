@@ -1,0 +1,43 @@
+{% extends 'base.html'%}
+
+{% block content %}
+    <h2>{% block title %} Editar {%endblock%}</h2>
+    <div class="row justify-content-center">
+        <div class="col-sm-8">
+           <div class="card">
+               <div class="card-body">
+                <h4 class="card-title">Editar usuario</h4>
+                <p class="card-text">Desde este formulario puedes editar, rol y contraseña del usuario</p>
+                    <div class="card-body">
+                        <form action="" method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre de usuario</label>
+                                <input type="text" class="form-control" id="username" name="username" required minlength="4" maxlength="20" value="{{user.username}}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password" minlength="4" maxlength="40" >
+                            </div>
+                            <div class="mb-3">
+                                <label for="user{{user.roll_id }}" class="form-label">El rol del usuario actualmente es de <strong>{{user_rol.roll_name}}</strong></label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rolid" class="form-label">Rol</label>
+                                <select class="form-select" id="rolid" name="roll_id" required>
+                                    {% for role in roles %}
+                                        <option value="{{ role.id }}">{{ role.roll_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Editar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}           

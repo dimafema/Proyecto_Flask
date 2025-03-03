@@ -24,14 +24,16 @@ def test():
     return "Blueprint 'icaro' funcionando correctamente."
 
 @bp.route('/')
+@login_required
 def index():
-    # try:
-    #     total_preguntas = Quiz.query.count()  # Obtener el total de preguntas
-    # except Exception as e:
-    #     total_preguntas = 0  # Si hay un error (como que la tabla no exista aún)
-    #     logging.error(f'Error al obtener el total de preguntas: {str(e)}')
-
-    return render_template('index_public.html', total_preguntas=100)
+    try:
+        total_preguntas = Quiz.query.count()  # Obtener el total de preguntas
+    except Exception as e:
+        total_preguntas = 0  # Si hay un error (como que la tabla no exista aún)
+        logging.error(f'Error al obtener el total de preguntas: {str(e)}')
+    
+    # Renderizar 'index.html' si el usuario está registrado
+    return render_template('icaro/index.html', total_preguntas=total_preguntas)
 
 # vistas para crear grupos, campos, recursos y niveles
 

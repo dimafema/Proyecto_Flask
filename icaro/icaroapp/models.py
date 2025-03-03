@@ -56,7 +56,7 @@ class Group(db.Model):  # Grupo de colectivos de aprendizaje (ej. Bomberos, Poli
 class Field(db.Model):  # Campo de conocimiento o disciplina (ej. Específico, General, Administración, etc.)
     __tablename__ = 'fields'
     id = db.Column(db.Integer, primary_key=True)
-    field_name = db.Column(db.String(20), unique=True, nullable=False)
+    field_name = db.Column(db.String(20), nullable=False)
     field_description = db.Column(db.Text, nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
 
@@ -71,7 +71,7 @@ class Field(db.Model):  # Campo de conocimiento o disciplina (ej. Específico, G
 class Resource(db.Model):  # Recursos de aprendizaje (ej. Módulo, Tema, etc.)
     __tablename__ = 'resources'
     id = db.Column(db.Integer, primary_key=True)
-    resource_name = db.Column(db.String(20), unique=True, nullable=False)
+    resource_name = db.Column(db.String(100), unique=True, nullable=False)
     resource_description = db.Column(db.Text, nullable=False)
     resource_url = db.Column(db.Text, nullable=False)
     field_id = db.Column(db.Integer, db.ForeignKey('fields.id'), nullable=False)

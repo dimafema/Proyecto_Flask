@@ -22,6 +22,7 @@ def clean_json_response(response_text):
 
     return response_text
 
+
 def generate_complex_question(text, ask_title_group, group_id=1, field_id=1, resource_id=1, nivel_id=1):
     """
     Genera preguntas de examen tipo test sin repetir preguntas ya existentes en la base de datos.

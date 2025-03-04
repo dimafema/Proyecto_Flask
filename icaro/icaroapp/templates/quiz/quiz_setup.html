@@ -107,7 +107,7 @@
                         fetch(`/icaro/get_niveles/${resourceId}`)
                             .then(response => response.json())
                             .then(data => {
-                                nivelSelect.innerHTML = '<option value="">-- Selecciona un Nivel --</option>';
+                                nivelSelect.innerHTML = '';  // Limpiar el contenido del menú desplegable
                                 data.niveles.forEach(nivel => {
                                     nivelSelect.innerHTML += `<option value="${nivel.id}">${nivel.name}</option>`;
                                 });
@@ -120,7 +120,7 @@
                     }
                 });
 
-                // Mostrar el campo de cantidad de preguntas cuando se selecciona un nivel
+                // Mostrar el campo de cantidad de preguntas que desea realiza cuando se selecciona un nivel
                 nivelSelect.addEventListener("change", function () {
                     if (this.value) {
                         questionCountContainer.style.display = "block";
@@ -139,7 +139,10 @@
                     let resourceId = document.getElementById("resourceSelect").value;
                     let nivelId = document.getElementById("nivelSelect").value;
                     let numQuestions = document.getElementById("questionCount").value;
-                    document.getElementById("quizForm").action = `/icaro/quiz/${resourceId}/${nivelId}/${numQuestions}`;
+                
+                    if (resourceId && nivelId && numQuestions) {
+                        document.getElementById("quizForm").action = `/icaro/quiz/${resourceId}/${nivelId}/${numQuestions}`;
+                    }
                 }
             });
         </script>

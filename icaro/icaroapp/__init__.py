@@ -5,6 +5,7 @@ from flask_login import LoginManager
 import logging
 from flask import render_template
 
+
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -55,6 +56,14 @@ def create_app():
     # Define la ruta raíz
     @app.route('/')
     def index():
-        return render_template('index_public.html')
+        from .models import Quiz
+        try:
+            total_preguntas = Quiz.query.count()  # Obtener el total de preguntas
+        except Exception as e:
+            total_preguntas = 0  # Si hay un error (como que la tabla no exista aún)
+            logging.error(f'Error al obtener el total de preguntas: {str(e)}')
+        
+        # Renderizar 'index.html' si el usuario está registrado
+        return render_template('index_public.html', total_preguntas=total_preguntas)
 
     return app

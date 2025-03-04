@@ -19,10 +19,6 @@ from flask import Blueprint
 
 bp = Blueprint('icaro', __name__, url_prefix='/icaro'  )  
 
-@bp.route('/test')
-def test():
-    return "Blueprint 'icaro' funcionando correctamente."
-
 @bp.route('/')
 @login_required
 def index():
@@ -35,7 +31,7 @@ def index():
     # Renderizar 'index.html' si el usuario está registrado
     return render_template('icaro/index.html', total_preguntas=total_preguntas)
 
-# vistas para crear grupos, campos, recursos y niveles
+# CREAR grupos, campos, recursos y niveles
 
 @bp.route('/creategroup', methods=('GET', 'POST'))
 @login_required
@@ -150,7 +146,7 @@ def createnivel():
 
     return render_template('icaro/createnivel.html', resources=resources)
 
-# vistas para listar, grupos, campos, recursos y niveles
+# LISTAR grupos, campos, recursos y niveles
 
 @bp.route('/listgroups')
 @login_required
@@ -194,7 +190,7 @@ def listquizzes():
         per_page=per_page
     )
 
-# vistas para editar y eliminar grupos, campos, recursos y niveles
+# EDITAR grupos, campos, recursos y niveles
 
 @bp.route('/editgroup/<int:id>', methods=('GET', 'POST'))
 @login_required
@@ -356,7 +352,7 @@ def editquiz(id):
 
     return render_template('quiz/editquiz.html',groups=groups, fields=fields, resources=resources, niveles=niveles, quiz=quiz)
 
-# vistar para eliminar grupos, campos, recursos y niveles
+# ELIMINAR grupos, campos, recursos y niveles
 
 @bp.route('/deletegroup/<int:id>')
 @login_required
@@ -419,8 +415,9 @@ def deletequiz(id):
     flash('Pregunta eliminada correctamente')
     return redirect(url_for('icaro.listquizzes'))
 
-# vista para cargar preguntas, responder preguntas y ver resultados
+# SUBIR preguntas, responder preguntas y ver resultados
 
+# Subir un archivo PDF y extraer preguntas
 @bp.route('/upload', methods=['POST'])
 def upload_pdf():
     if "file" not in request.files:
@@ -457,6 +454,7 @@ def upload_pdf():
     flash("No se generaron preguntas nuevas.", "warning")
     return redirect(url_for('icaro.upload_quiz'))
 
+# Subir preguntas desde un archivo CSV
 @bp.route('/upload_quiz', methods=['GET', 'POST'])
 @login_required
 def upload_quiz():
@@ -519,7 +517,8 @@ def upload_quiz():
         quizzes_pagination=quizzes_pagination, 
         per_page=per_page
     )
-    
+
+# Exportar preguntas en formato Excel    
 @bp.route('/quiz/exportquiz', methods=['GET'])
 def export_questions_excel():
     """Exporta todas las preguntas en formato Excel."""
@@ -567,7 +566,7 @@ def export_questions_excel():
     except Exception as e:
         return {"error": str(e)}, 500
 
-
+# Importar preguntas desde un archivo Excel
 @bp.route('/import/excel', methods=['GET', 'POST'])
 def importquiz():
     """Importar preguntas desde un archivo Excel y guardarlas en PostgreSQL, asegurando conversión de tipos."""
@@ -588,7 +587,7 @@ def importquiz():
             required_columns = [
                 "Pregunta", "Opción 1", "Opción 2", "Opción 3", "Opción 4",
                 "Respuesta Correcta", "Explicación", "Grupo ID", "Field ID",
-                "Resource ID", "Nivel ID", "Número Examen"
+                "Resource ID", "Nivel ID"
             ]
 
             for col in required_columns:
@@ -597,7 +596,7 @@ def importquiz():
                     return render_template('quiz/upload_quiz.html')
 
             # Limpiar valores incorrectos y convertir columnas numéricas
-            numeric_columns = ["Grupo ID", "Field ID", "Resource ID", "Nivel ID", "Número Examen"]
+            numeric_columns = ["Grupo ID", "Field ID", "Resource ID", "Nivel ID"]
             
             for col in numeric_columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')  # Convierte texto en NaN si hay errores
@@ -642,36 +641,56 @@ def importquiz():
 
     return render_template('quiz/upload_quiz.html')
 
+# responder preguntas
 @bp.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+    attempt_id = session.get('attempt_id')
+    attempt = QuizAttempt.query.get(attempt_id)
+    questions = QuizAttemptQuestion.query.filter_by(attempt_id=attempt_id).all()
+    question_index = next((index for (index, d) in enumerate(questions) if d.quiz_id == quiz_id), None)
+    total_questions = len(questions)
+    question = questions[question_index] if question_index is not None else None
+    
+    # Depuración: Verificar qué preguntas tiene el intento actual
+    print(f"Intento ID: {attempt_id}, Total Preguntas: {total_questions}, Pregunta Index: {question_index}")
+    
+    if question_index is None:
+        flash('No se pudo encontrar la pregunta actual.', 'danger')
+        return redirect(url_for('icaro.quiz_setup'))
+    prev_enabled = question_index > 0
+    next_enabled = question_index < total_questions - 1
+    
     if request.method == 'POST':
         user_answer = request.form.get('answer')
         user_score = 1 if user_answer == quiz.correct_answer else 0
-       
-        
+
         user_quiz = UserQuiz(
             user_id=current_user.id,
             quiz_id=quiz.id,
             user_answer=user_answer,
             user_score=user_score,
-            user_date=datetime.utcnow()
+            user_date=datetime.utcnow(),
+            attempt_id=attempt_id # Asociar el intento actual
         )
         db.session.add(user_quiz)
         db.session.commit()
         flash('Respuesta registrada correctamente.')
         next_quiz = Quiz.query.filter(Quiz.id > quiz_id).order_by(Quiz.id).first()
         if next_quiz:
-            return redirect(url_for('icaro.quiz', quiz_id=next_quiz.id))
+            return redirect(url_for('icaro.quiz', quiz_id=next_quiz.id, attempt_id=attempt_id))
         else:
-            return redirect(url_for('icaro.quiz_results'))
-    return render_template('quiz/quiz.html', quiz=quiz)
+            return redirect(url_for('icaro.quiz_results', attempt_id=attempt_id))
 
+    return render_template('quiz/quiz.html', quiz=quiz, question_index=question_index, total_questions=total_questions, question=question,prev_enabled=prev_enabled,
+    next_enabled=next_enabled)
+
+# Crear preguntas para resolver
 @bp.route('/quiz/<int:resource_id>/<int:nivel_id>/<int:num_questions>', methods=['GET'])
 @login_required
 def start_quiz(resource_id, nivel_id, num_questions):
-    """Inicia un intento de quiz, seleccionando preguntas aleatorias y registrándolo en la base de datos."""
+    """Inicia un intento de examen, seleccionando preguntas aleatorias y registrándolo en la base de datos."""
 
     # Obtener preguntas disponibles
     available_questions = Quiz.query.filter_by(resource_id=resource_id, nivel_id=nivel_id).all()
@@ -702,9 +721,11 @@ def start_quiz(resource_id, nivel_id, num_questions):
 
     # Guardar el ID del intento en la sesión
     session['attempt_id'] = new_attempt.id
+    # Redirigir al primer quiz_id
+    first_quiz_id = selected_questions[0].id
+    return redirect(url_for('icaro.quiz', attempt_id=new_attempt.id, quiz_id=first_quiz_id))
 
-    return redirect(url_for('icaro.quiz', attempt_id=new_attempt.id))
-
+# VER resultados de un intento de examen
 @bp.route('/quiz_results/<int:attempt_id>')
 @login_required
 def quiz_results(attempt_id):
@@ -718,7 +739,7 @@ def quiz_results(attempt_id):
 
     return render_template('quiz/quiz_results.html', attempt=attempt)
 
-# vista para seleccionar grupo, campo, recurso y nivel
+# SELECCIONAR grupo, campo, recurso y nivel
 @bp.route('/quiz_setup', methods=['GET'])
 @login_required
 def quiz_setup():
@@ -743,6 +764,7 @@ def get_niveles(resource_id):
     niveles = Nivel.query.join(Quiz).filter(Quiz.resource_id == resource_id).distinct().all()
     return {'niveles': [{'id': n.id, 'name': n.nivel_name} for n in niveles]}
 
+# REQUIERE login
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):

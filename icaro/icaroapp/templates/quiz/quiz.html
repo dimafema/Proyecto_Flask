@@ -10,7 +10,7 @@
         <h4>Pregunta {{ question_index + 1 }} de {{ total_questions }}</h4>
         <p><strong>{{ question.ask_name }}</strong></p>
         <form method="POST">
-            {% for answer in question.get_valid_answers() if answer and answer.strip() %}  
+            {% for answer in quiz.get_valid_answers() if answer and answer.strip() %}  
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="answer" value="{{ answer }}"
                         {% if answer == previous_answer %}checked{% endif %} required>

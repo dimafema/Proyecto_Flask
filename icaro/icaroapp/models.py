@@ -119,36 +119,34 @@ class Quiz(db.Model):  # Preguntas de los cuestionarios de aprendizaje
     resource_id = db.Column(db.Integer, db.ForeignKey('resources.id'), nullable=False)
     nivel_id = db.Column(db.Integer, db.ForeignKey('niveles.id'), nullable=False)
 
-    
-
     def get_valid_answers(self):
         """Retorna solo las respuestas que no son nulas"""
-        return [answer for answer in [self.answer1, self.answer2, self.answer3, self.answer4] if answer and answer.strip()]
+        return [answer for answer in [self.answer1, self.answer2, self.answer3, self.answer4, self.answer5, self.answer6, self.answer7, self.answer8] if answer and answer.strip()]
 
     def __repr__(self):
         return f'<Quiz: {self.ask_name}>'
 
-class QuizAttempt(db.Model):
-    __tablename__ = "quiz_attempts"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    questions = db.relationship('QuizAttemptQuestion', backref='attempt', lazy=True)
+class QuizAttempt(db.Model): # Intentos de cuestionarios de aprendizaje
+    __tablename__ = "quiz_attempts" # Tabla de intentos de cuestionarios
+    id = db.Column(db.Integer, primary_key=True) # Identificador único del intento
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # Identificador del usuario que realiza el intento
+    created_at = db.Column(db.DateTime, default=datetime.utcnow) # Fecha y hora de creación del intento
+    questions = db.relationship('QuizAttemptQuestion', backref='attempt', lazy=True) # Relación con las preguntas del intento
 
-class QuizAttemptQuestion(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    attempt_id = db.Column(db.Integer, db.ForeignKey('quiz_attempts.id'), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
-    user_answer = db.Column(db.String, nullable=True)  # Respuesta del usuario
-    score = db.Column(db.Integer, default=0)
-    quiz = db.relationship('Quiz', foreign_keys=[quiz_id])  # ✅ Relación corregida
+class QuizAttemptQuestion(db.Model): # Preguntas de los cuestionarios de aprendizaje
+    id = db.Column(db.Integer, primary_key=True) # Identificador único de la pregunta del intento
+    attempt_id = db.Column(db.Integer, db.ForeignKey('quiz_attempts.id'), nullable=False) # Identificador del intento al que pertenece la pregunta
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False) # Identificador de la pregunta del cuestionario
+    user_answer = db.Column(db.String, nullable=True)  # Respuesta del usuario a la pregunta
+    score = db.Column(db.Integer, default=0) # Puntuación obtenida en la pregunta
+    quiz = db.relationship('Quiz', foreign_keys=[quiz_id])  # Relación con la tabla Quiz
 
 class UserQuiz(db.Model):  # Cuestionarios de aprendizaje realizados por los usuarios
     __tablename__ = 'userquizzes'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
-    user_answer = db.Column(db.Text, nullable=False)  # Corregido
+    id = db.Column(db.Integer, primary_key=True) # Identificador único del cuestionario
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # Identificador del usuario que realiza el cuestionario
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False) # Identificador de la pregunta del cuestionario
+    user_answer = db.Column(db.Text, nullable=False)  # Respuesta del usuario
     user_score = db.Column(db.Integer, nullable=False)  # Puntaje del usuario
     user_date = db.Column(db.DateTime, nullable=False)  # Fecha de realización del cuestionario
     attempt_id = db.Column(db.Integer, nullable=False)  # Identificador del intento

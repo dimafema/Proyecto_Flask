@@ -6,9 +6,8 @@
 </div>
 <div class="center-container">
     <div class="container">
-        
-        <h4>Pregunta {{ question_index + 1 }} de {{ total_questions }}</h4>
-        <p><strong>{{ quiz.ask_name }}</strong></p>
+        <h6>Pregunta {{ question_index + 1 }} de {{ total_questions }}</h6>
+        <h5><strong>{{ quiz.ask_name }}</strong></h5>
         <form method="POST">
             {% for answer in quiz.get_valid_answers() if answer and answer.strip() %}  
                 <div class="form-check">
@@ -21,10 +20,12 @@
                 {% if prev_enabled %}
                     <button type="submit" name="prev" class="btn btn-secondary">Anterior</button>
                 {% endif %}
-
+        
                 {% if next_enabled %}
                     <button type="submit" name="next" class="btn btn-primary">Siguiente</button>
-                {% else %}
+                {% endif %}
+        
+                {% if not next_enabled %}  <!-- Solo mostrar si es la última pregunta -->
                     <button type="submit" name="finish" class="btn btn-success">Terminar Evaluación</button>
                 {% endif %}
             </div>

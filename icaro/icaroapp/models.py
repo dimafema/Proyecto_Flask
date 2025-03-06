@@ -131,7 +131,6 @@ class QuizAttempt(db.Model): # Intentos de cuestionarios de aprendizaje
     id = db.Column(db.Integer, primary_key=True) # Identificador único del intento
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # Identificador del usuario que realiza el intento
     created_at = db.Column(db.DateTime, default=datetime.utcnow) # Fecha y hora de creación del intento
-    questions = db.relationship('QuizAttemptQuestion', backref='attempt', lazy=True) # Relación con las preguntas del intento
 
 class QuizAttemptQuestion(db.Model): # Preguntas de los cuestionarios de aprendizaje
     id = db.Column(db.Integer, primary_key=True) # Identificador único de la pregunta del intento
@@ -139,7 +138,6 @@ class QuizAttemptQuestion(db.Model): # Preguntas de los cuestionarios de aprendi
     quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False) # Identificador de la pregunta del cuestionario
     user_answer = db.Column(db.String, nullable=True)  # Respuesta del usuario a la pregunta
     score = db.Column(db.Integer, default=0) # Puntuación obtenida en la pregunta
-    quiz = db.relationship('Quiz', foreign_keys=[quiz_id])  # Relación con la tabla Quiz
 
 class UserQuiz(db.Model):  # Cuestionarios de aprendizaje realizados por los usuarios
     __tablename__ = 'userquizzes'

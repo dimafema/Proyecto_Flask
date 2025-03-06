@@ -655,15 +655,27 @@ def quiz(quiz_id):
     
     # Depuración: Verificar qué preguntas tiene el intento actual
     print(f"Intento ID: {attempt_id}, Total Preguntas: {total_questions}, Pregunta Index: {question_index}")
+    print(f"Pregunta actual: {quiz.ask_name}")
+    print(f"Pregunta index: {question_index}, Total preguntas: {total_questions}")
     
+    prev_enabled = question_index > 0
+    next_enabled = question_index < total_questions - 1
+    # Asegurar que question_index no sea None
     if question_index is None:
         flash('No se pudo encontrar la pregunta actual.', 'danger')
         return redirect(url_for('icaro.quiz_setup'))
-    prev_enabled = question_index > 0
-    next_enabled = question_index < total_questions - 1
+
+    
+    
+    print(f"prev_enabled: {prev_enabled}, next_enabled: {next_enabled}")
     
     if request.method == 'POST':
         user_answer = request.form.get('answer')
+        print(f"Respuesta seleccionada: {user_answer}")  # 🔍 Depuración
+
+        if not user_answer:
+            flash("Debes seleccionar una respuesta antes de continuar.", "warning")
+            return redirect(url_for('icaro.quiz', quiz_id=quiz_id, attempt_id=attempt_id))
         user_score = 1 if user_answer == quiz.correct_answer else 0
 
         user_quiz = UserQuiz(
@@ -677,12 +689,19 @@ def quiz(quiz_id):
         db.session.add(user_quiz)
         db.session.commit()
         flash('Respuesta registrada correctamente.')
-        next_quiz = Quiz.query.filter(Quiz.id > quiz_id).order_by(Quiz.id).first()
-        if next_quiz:
-            return redirect(url_for('icaro.quiz', quiz_id=next_quiz.id, attempt_id=attempt_id))
-        else:
-            return redirect(url_for('icaro.quiz_results', attempt_id=attempt_id))
+        # Verificar si hay una siguiente pregunta
+        next_quiz = QuizAttemptQuestion.query.filter(
+        QuizAttemptQuestion.attempt_id == attempt_id,
+        QuizAttemptQuestion.quiz_id > quiz_id
+        ).order_by(QuizAttemptQuestion.quiz_id).first()
 
+        if next_quiz:
+            return redirect(url_for('icaro.quiz', quiz_id=next_quiz.quiz_id, attempt_id=attempt_id))
+        else:
+            print("No hay más preguntas. Redirigiendo a los resultados.")  # 🔍 Depuración
+            flash("Has completado todas las preguntas.", "success")
+            return redirect(url_for('icaro.quiz_results', attempt_id=attempt_id))
+    print(f"Pregunta enviada a la plantilla: {quiz.ask_name}")
     return render_template('quiz/quiz.html', quiz=quiz, question_index=question_index, total_questions=total_questions, question=question,prev_enabled=prev_enabled,
     next_enabled=next_enabled)
 

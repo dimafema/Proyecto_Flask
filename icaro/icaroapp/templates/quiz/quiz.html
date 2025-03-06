@@ -8,7 +8,7 @@
     <div class="container">
         
         <h4>Pregunta {{ question_index + 1 }} de {{ total_questions }}</h4>
-        <p><strong>{{ question.ask_name }}</strong></p>
+        <p><strong>{{ quiz.ask_name }}</strong></p>
         <form method="POST">
             {% for answer in quiz.get_valid_answers() if answer and answer.strip() %}  
                 <div class="form-check">

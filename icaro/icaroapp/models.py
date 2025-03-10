@@ -149,12 +149,18 @@ class UserQuiz(db.Model):  # Cuestionarios de aprendizaje realizados por los usu
     user_date = db.Column(db.DateTime, nullable=False)  # Fecha de realización del cuestionario
     attempt_id = db.Column(db.Integer, nullable=False)  # Identificador del intento
     
-    def __init__(self, user_id, quiz_id, user_answer, user_score, user_date, attempt_id):
+    
+    # Agregar la relación con Quiz
+    quiz = db.relationship('Quiz', backref='userquizzes')
+
+    
+    def __init__(self, user_id, quiz_id, user_answer, user_score, user_date, attempt_id): 
         self.user_id = user_id
         self.quiz_id = quiz_id
         self.user_answer = user_answer
         self.user_score = user_score
         self.user_date = user_date
         self.attempt_id = attempt_id  
+        self.quiz = Quiz.query.get(quiz_id) #
     def __repr__(self):
         return f'<UserQuiz: {self.user_id} , Attempt {self.attempt_id}>'

@@ -646,7 +646,6 @@ def importquiz():
 def quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     attempt_id = session.get('attempt_id')
-    attempt = QuizAttempt.query.get(attempt_id)
 
     # Obtener todas las preguntas del intento en orden de inserción (id autoincremental)
     questions = QuizAttemptQuestion.query.filter_by(attempt_id=attempt_id).order_by(QuizAttemptQuestion.id).all()
@@ -672,7 +671,7 @@ def quiz(quiz_id):
 
     # Obtener la respuesta anterior si existe
     previous_response = UserQuiz.query.filter_by(
-        user_id=current_user.id,
+        user_id=g.user.id,
         quiz_id=quiz.id,
         attempt_id=attempt_id
     ).first()
@@ -693,7 +692,7 @@ def quiz(quiz_id):
         else:
             # Si no existe, crear una nueva respuesta
             user_quiz = UserQuiz(
-                user_id=current_user.id,
+                user_id=g.user.id,
                 quiz_id=quiz.id,
                 user_answer=user_answer,
                 user_score=user_score,
@@ -747,7 +746,7 @@ def start_quiz(resource_id, nivel_id, num_questions):
     selected_questions = random.sample(available_questions, min(num_questions, len(available_questions)))
 
     # Crear un nuevo intento de quiz
-    new_attempt = QuizAttempt(user_id=current_user.id)
+    new_attempt = QuizAttempt(user_id=g.user.id)
     db.session.add(new_attempt)
     db.session.commit()
 
@@ -770,18 +769,35 @@ def start_quiz(resource_id, nivel_id, num_questions):
     return redirect(url_for('icaro.quiz', attempt_id=new_attempt.id, quiz_id=first_quiz_id))
 
 # VER resultados de un intento de examen
-@bp.route('/quiz_results/<int:attempt_id>')
+@bp.route('/quiz_results')
 @login_required
-def quiz_results(attempt_id):
-    """Muestra los resultados del intento del usuario."""
+def quiz_results():
+    """Muestra la lista de intentos realizados por el usuario."""
     
-    attempt = QuizAttempt.query.filter_by(id=attempt_id, user_id=current_user.id).first()
+    attempts = QuizAttempt.query.filter_by(user_id=g.user.id).order_by(QuizAttempt.created_at.desc()).all()
+   
+    return render_template(
+        'quiz/quiz_results.html', 
+        attempts=attempts
+    )
+@bp.route('/quiz_attempt/<int:attempt_id>')
+@login_required
+def quiz_attempt(attempt_id):
+    """Muestra los detalles de un intento específico, incluyendo preguntas y respuestas."""
 
+    attempt = QuizAttempt.query.filter_by(id=attempt_id, user_id=g.user.id).first() # Obtener el intento del usuario
     if not attempt:
         flash("No se encontró el intento.", "danger")
-        return redirect(url_for('icaro.quiz_setup'))
+        return redirect(url_for('icaro.quiz_results'))
 
-    return render_template('quiz/quiz_results.html', attempt=attempt)
+    user_answers = UserQuiz.query.filter_by(attempt_id=attempt_id).all() # Obtener las respuestas del intento
+
+
+    return render_template(
+        'quiz/quiz_attempt.html',
+        attempt=attempt,
+        user_answers=user_answers
+    )
 
 # SELECCIONAR grupo, campo, recurso y nivel
 @bp.route('/quiz_setup', methods=['GET'])

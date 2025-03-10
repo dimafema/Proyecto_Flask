@@ -37,6 +37,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="#">Perfil</a></li>
                       <li><a class="dropdown-item" href="#">Configuración</a></li>
+                      <li><a class="dropdown-item" href="{{url_for('icaro.quiz_results')}}">Evaluaciones</a></li>
                       {% if g.user.roll_id == 1 %}
                       <li><hr class="dropdown-divider">Usuarios</li>
                       <li><a class="dropdown-item" href="{{url_for('admin.listrols')}}">Rol</a></li>
@@ -75,18 +76,28 @@
 
       {% block content %}
       {% endblock %} 
-
-      {%for massage in get_flashed_messages()%}
-        <div class="container mt-3">
-            <div class="row">
-              <div class="col-md-6 mx-auto">
-                <div class="alert alert-primary" role="alert">
-                    {{massage}}
-                </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {%for massage in get_flashed_messages()%}
+              <div id="flash-messages">
+              <div class="container mt-3">
+                  <div class="row">
+                    <div class="col-md-6 mx-auto">
+                      <div class="alert alert-primary" role="alert">
+                          {{massage}}
+                      </div>
+                    </div>
+                  </div>
               </div>
-            </div>
-        </div>
-      {% endfor %} 
+              </div>
+            {% endfor %} 
+            <script>
+              setTimeout(function() {
+                  document.getElementById('flash-messages').style.display = 'none';
+              }, 2000);  // 2000 milisegundos = 2 segundos
+            </script>
+        {% endif %}
+      {% endwith %}
   
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>

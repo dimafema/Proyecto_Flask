@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 import logging
 from flask import render_template
 
@@ -25,9 +25,9 @@ def create_app():
     login_manager.init_app(app)  # Inicializar Flask-Login
 
     # Configurar la vista de inicio de sesión
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'auth_bp.login'
     
-      # Definir el user_loader
+    # Definir el user_loader
     from .models import User
     
     @login_manager.user_loader
@@ -37,23 +37,22 @@ def create_app():
     # Registro de Blueprints con manejo de errores
     try:
         from . import icaro
-        app.register_blueprint(icaro.bp)
+        app.register_blueprint(icaro.bp, name='icaro_bp')
     except Exception as e:
         logging.error(f'Error al registrar Blueprint "icaro": {str(e)}')
 
     try:
         from . import auth
-        app.register_blueprint(auth.bp)
+        app.register_blueprint(auth.bp, name='auth_bp')  # Evita conflicto de nombres
     except Exception as e:
         logging.error(f'Error al registrar Blueprint "auth": {str(e)}')
         
     try:
         from . import admin
-        app.register_blueprint(admin.bp)
+        app.register_blueprint(admin.bp, name='admin_bp')
     except Exception as e:
         logging.error(f'Error al registrar Blueprint "admin": {str(e)}')
 
-    # Define la ruta raíz
     @app.route('/')
     def index():
         from .models import Quiz
@@ -63,7 +62,9 @@ def create_app():
             total_preguntas = 0  # Si hay un error (como que la tabla no exista aún)
             logging.error(f'Error al obtener el total de preguntas: {str(e)}')
         
-        # Renderizar 'index.html' si el usuario está registrado
-        return render_template('index_public.html', total_preguntas=total_preguntas)
-
+        if current_user.is_authenticated:
+            return render_template('icaro/index.html', total_preguntas=total_preguntas)
+        else:
+            return render_template('index_public.html', total_preguntas=total_preguntas)
+    
     return app

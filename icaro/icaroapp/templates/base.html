@@ -16,11 +16,7 @@
       {%block header%}  
           <nav class="navbar navbar-expand-sm navbar-dark bg-dark" data-bs-theme="dark">
             <div class="container-fluid">
-              {% if g.user %}
-              <a class="navbar-brand" href="{{url_for('icaro.index')}}">Ciberaxon</a>
-              {% else %}
               <a class="navbar-brand" href="{{url_for('index')}}">Ciberaxon</a>
-              {% endif %}
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>

@@ -19,22 +19,10 @@ from flask import Blueprint
 
 bp = Blueprint('icaro', __name__, url_prefix='/icaro'  )  
 
-@bp.route('/')
-@login_required
-def index():
-    try:
-        total_preguntas = Quiz.query.count()  # Obtener el total de preguntas
-    except Exception as e:
-        total_preguntas = 0  # Si hay un error (como que la tabla no exista aún)
-        logging.error(f'Error al obtener el total de preguntas: {str(e)}')
-    
-    # Renderizar 'index.html' si el usuario está registrado
-    return render_template('icaro/index.html', total_preguntas=total_preguntas)
-
 # CREAR grupos, campos, recursos y niveles
 
 @bp.route('/creategroup', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def creategroup():
     if request.method == 'POST':
         group_name = request.form.get('group_name')
@@ -57,7 +45,7 @@ def creategroup():
     return render_template('icaro/creategroup.html')
 
 @bp.route('/createfield', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def createfield():
     groups = Group.query.all()
     print(groups)
@@ -83,7 +71,7 @@ def createfield():
     return render_template('icaro/createfield.html', grupo=groups)
 
 @bp.route('/createresource', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def createresource():
         fields = Field.query.all()
         if request.method == 'POST':
@@ -108,7 +96,7 @@ def createresource():
         return render_template('icaro/createresource.html', fields=fields) 
 
 @bp.route('/createnivel', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def createnivel():
     resources = Resource.query.all()  # Obtener la lista de recursos
 
@@ -149,31 +137,31 @@ def createnivel():
 # LISTAR grupos, campos, recursos y niveles
 
 @bp.route('/listgroups')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listgroups():
     groups = Group.query.all()
     return render_template('icaro/listgroup.html', group=groups)
 
 @bp.route('/listfields')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listfields():
     fields = Field.query.all()
     return render_template('icaro/listfields.html', field=fields)
 
 @bp.route('/listresources')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listresources():
         resources = Resource.query.all()
         return render_template('icaro/listresources.html', resources=resources)    
 
 @bp.route('/listniveles')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listniveles():
     niveles = Nivel.query.all()
     return render_template('icaro/listniveles.html', niveles=niveles) 
 
 @bp.route('/listquizzes')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listquizzes():
     # Obtener parámetros de la URL para la paginación
     per_page = request.args.get('per_page', 10, type=int)
@@ -193,7 +181,7 @@ def listquizzes():
 # EDITAR grupos, campos, recursos y niveles
 
 @bp.route('/editgroup/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editgroup(id):
     group = Group.query.get(id)
     if group is None:
@@ -217,7 +205,7 @@ def editgroup(id):
     return render_template('icaro/editgroup.html', group=group)
 
 @bp.route('/editfield/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editfield(id):
     field = Field.query.get(id)
     groups = Group.query.all()
@@ -245,7 +233,7 @@ def editfield(id):
     return render_template('icaro/editfield.html', field=field, groups=groups)
 
 @bp.route('/editresource/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editresource(id):
     resource = Resource.query.get(id)
     fields = Field.query.all()
@@ -270,7 +258,7 @@ def editresource(id):
     return render_template('icaro/editresource.html', resource=resource, fields=fields)
 
 @bp.route('/editnivel/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editnivel(id):
     nivel = Nivel.query.get(id)
 
@@ -295,7 +283,7 @@ def editnivel(id):
     return render_template('icaro/editnivel.html', nivel=nivel)
 
 @bp.route('/editquiz/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editquiz(id):
     quiz = Quiz.query.get(id)
     groups = Group.query.all()
@@ -355,7 +343,7 @@ def editquiz(id):
 # ELIMINAR grupos, campos, recursos y niveles
 
 @bp.route('/deletegroup/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deletegroup(id):
     group = Group.query.get(id)
     if group is None:
@@ -367,7 +355,7 @@ def deletegroup(id):
     return redirect(url_for('icaro.listgroups'))
 
 @bp.route('/deletefield/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deletefield(id):
     field = Field.query.get(id)
     if field is None:
@@ -379,7 +367,7 @@ def deletefield(id):
     return redirect(url_for('icaro.listfields'))
 
 @bp.route('/deleteresource/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deleteresource(id):
     resource = Resource.query.get(id)
     if resource is None:
@@ -391,7 +379,7 @@ def deleteresource(id):
     return redirect(url_for('icaro.listresources'))
 
 @bp.route('/deletenivel/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deletenivel(id):
     nivel = Nivel.query.get(id)
     if nivel is None:
@@ -403,7 +391,7 @@ def deletenivel(id):
     return redirect(url_for('icaro.listniveles'))
 
 @bp.route('/deletequiz/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deletequiz(id):
     quiz = Quiz.query.get(id)
     if quiz is None:
@@ -419,6 +407,7 @@ def deletequiz(id):
 
 # Subir un archivo PDF y extraer preguntas
 @bp.route('/upload', methods=['POST'])
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def upload_pdf():
     if "file" not in request.files:
         flash("No se ha subido ningún archivo.", "danger")
@@ -456,7 +445,7 @@ def upload_pdf():
 
 # Subir preguntas desde un archivo CSV
 @bp.route('/upload_quiz', methods=['GET', 'POST'])
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def upload_quiz():
     # Número de preguntas por página (predeterminado en 10)
     per_page = request.args.get('per_page', 10, type=int)
@@ -520,6 +509,7 @@ def upload_quiz():
 
 # Exportar preguntas en formato Excel    
 @bp.route('/quiz/exportquiz', methods=['GET'])
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def export_questions_excel():
     """Exporta todas las preguntas en formato Excel."""
     try:
@@ -568,6 +558,7 @@ def export_questions_excel():
 
 # Importar preguntas desde un archivo Excel
 @bp.route('/import/excel', methods=['GET', 'POST'])
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def importquiz():
     """Importar preguntas desde un archivo Excel y guardarlas en PostgreSQL, asegurando conversión de tipos."""
 
@@ -641,7 +632,7 @@ def importquiz():
 
     return render_template('quiz/upload_quiz.html')
 
-@bp.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@bp.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])# Resolver preguntas
 @login_required
 def quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
@@ -780,6 +771,8 @@ def quiz_results():
         'quiz/quiz_results.html', 
         attempts=attempts
     )
+
+# VER detalles de las preguntas de un intento de examen
 @bp.route('/quiz_attempt/<int:attempt_id>')
 @login_required
 def quiz_attempt(attempt_id):
@@ -825,11 +818,132 @@ def get_niveles(resource_id):
     return {'niveles': [{'id': n.id, 'name': n.nivel_name} for n in niveles]}
 
 # REQUIERE login
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    
-    return wrapped_view
+from flask import (
+    Blueprint, render_template, request, redirect, url_for, flash, session, g,)
+from werkzeug.security import generate_password_hash, check_password_hash
+from .models import User, Roll
+from flask_login import login_user, current_user
+from icaroapp import db
+import functools
+
+bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+
+# Consultas SQL
+def get_user(id):
+    return User.query.get(id)  # Usa get() en lugar de filter_by().first()
+
+
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = User.query.get(user_id)  # Evita usar get_or_404()
+
+
+# Vista de registro de usuarios
+
+@bp.route('/register', methods=('GET', 'POST'))
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        roll_id = request.form.get('roll_id')
+
+        error = None
+
+        if not username or not email or not password:
+            error = 'Todos los campos son obligatorios.'
+        elif not roll_id:
+            error = 'Debe seleccionar un rol.'
+        elif User.query.filter_by(username=username).first():
+            error = 'El nombre de usuario ya está en uso.'
+        elif User.query.filter_by(email=email).first():
+            error = 'El correo ya está registrado.'
+
+        if error is None:
+            user = User(username=username, email=email, password=generate_password_hash(password), roll_id=roll_id)
+            db.session.add(user)
+            db.session.commit()
+            flash('Usuario creado correctamente')
+            return redirect(url_for('admin.listusers'))
+
+        flash(error)
+        return redirect(url_for('auth.register'))
+
+    roles = Roll.query.all()
+    return render_template('auth/register.html', roles=roles)
+
+@bp.route('/edituser/<int:id>', methods=('GET', 'POST'))
+def edituser(id):
+    user = get_user(id)
+
+    if user is None:
+        flash('El usuario no existe.')
+        return redirect(url_for('admin.listusers'))
+
+    roles = Roll.query.all()
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        roll_id = request.form.get('roll_id')
+
+        if password:
+            user.password = generate_password_hash(password)  # Re-encriptar la nueva contraseña
+        if roll_id:
+            user.roll_id = roll_id
+
+        db.session.commit()
+        flash('Usuario editado correctamente')
+        return redirect(url_for('admin.listusers'))
+
+    return render_template('auth/edituser.html', roles=roles, user=user, user_rol=user.roll_id)
+
+# Funciones de autenticación de usuarios
+@bp.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session.clear()
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['roll_id'] = user.roll_id
+            flash('Usuario autenticado correctamente', 'success')
+            return redirect(url_for('icaro.index'))  
+        else:
+            flash('Usuario o contraseña incorrectos', 'danger') 
+    return render_template('auth/login.html')
+
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+
+def login_required(allowed_roles=None):
+    if allowed_roles is None:
+        allowed_roles = []
+
+    def decorator(view):
+        @functools.wraps(view)
+        def wrapped_view(**kwargs):
+            if g.user is None:
+                flash('Debe iniciar sesión para acceder a esta página.')
+                return redirect(url_for('auth.login'))
+
+            if allowed_roles and g.user.roll_id not in allowed_roles:
+                flash('No tiene permisos para acceder a esta página.', 'danger')
+                return redirect(url_for('icaro.index'))
+
+            return view(**kwargs)
+        return wrapped_view
+    return decorator

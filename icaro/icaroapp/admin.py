@@ -18,7 +18,7 @@ def get_user(id):
 # Vistas de administrador 
 
 @bp.route('/crearol', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def crearol():
     if request.method == 'POST':
         rolname = request.form.get('rolname')
@@ -44,20 +44,20 @@ def crearol():
 
 # Listar usuarios y roles
 @bp.route('/listusers')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listusers():
     users = User.query.all()
     return render_template('admin/listusers.html', users=users)
 
 @bp.route('/listrols')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listrols():
     rolls = Roll.query.all()
     return render_template('admin/listrols.html', rolls=rolls)
 
 # Editar y eliminar usuarios y roles
 @bp.route('/editrol/<int:id>', methods=('GET', 'POST'))
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editrol(id):
     rol = get_rol(id)
 
@@ -82,7 +82,7 @@ def editrol(id):
     return render_template('admin/editrol.html', rol=rol)
 
 @bp.route('/deleterol/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deleterol(id):
     rol = get_rol(id)
     
@@ -96,7 +96,7 @@ def deleterol(id):
     return redirect(url_for('admin.listrols'))
 
 @bp.route('/deleteuser/<int:id>')
-@login_required
+@login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deleteuser(id):
     user = get_user(id)
 

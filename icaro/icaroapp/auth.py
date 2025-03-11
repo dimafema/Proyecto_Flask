@@ -14,7 +14,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def get_user(id):
     return User.query.get(id)  # Usa get() en lugar de filter_by().first()
 
-
+# Antes de cada solicitud, si un usuario está conectado, se cargará en g.user
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -26,7 +26,6 @@ def load_logged_in_user():
 
 
 # Vista de registro de usuarios
-
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -109,13 +108,23 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+# Decorador para requerir inicio de sesión
+def login_required(view=None, allowed_roles=None):
+    if view is None:
+        return lambda v: login_required(v, allowed_roles)  # Permitir uso sin paréntesis
 
-def login_required(view):
+    if allowed_roles is None:
+        allowed_roles = []
+
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
             flash('Debe iniciar sesión para acceder a esta página.')
             return redirect(url_for('auth.login'))
+
+        if allowed_roles and g.user.roll_id not in allowed_roles:
+            flash('No tiene permisos para acceder a esta página.', 'danger')
+            return redirect(url_for('icaro.index'))
 
         return view(**kwargs)
 

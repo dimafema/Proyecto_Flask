@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block content %}
@@ -10,21 +11,20 @@
                 <tr>
                     <th>Intento</th>
                     <th>Fecha</th>
-                    <th>Ver Detalles</th>
+                    <th>Aciertos</th>
                 </tr>
             </thead>
             <tbody>
-                {% for attempt in attempts %}
+                {% for attempt in user_quizzes | groupby("attempt_id") %}
                 <tr>
-                    <td>{{ loop.index }}</td> 
-                    <td>{{ attempt.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    <td>
-                        <a href="{{ url_for('icaro.quiz_attempt', attempt_id=attempt.id) }}" class="btn btn-info">Ver</a>
-                    </td>
+                    <td>{{ attempt.grouper }}</td>
+                    <td>{{ attempt.list[0].user_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ attempt.list | sum(attribute='user_score') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
 {% endblock %}

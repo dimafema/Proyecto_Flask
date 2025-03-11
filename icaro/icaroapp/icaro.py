@@ -14,6 +14,8 @@ import pandas as pd
 from werkzeug.utils import secure_filename
 from icaroapp.process_pdf import extract_text_from_pdf
 from icaroapp.generate_questions import generate_complex_question, save_questions_to_csv
+from werkzeug.security import generate_password_hash, check_password_hash
+from .models import User, Roll
 
 from flask import Blueprint
 
@@ -637,6 +639,7 @@ def importquiz():
 def quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     attempt_id = session.get('attempt_id')
+    attempt = QuizAttempt.query.get(attempt_id)
 
     # Obtener todas las preguntas del intento en orden de inserción (id autoincremental)
     questions = QuizAttemptQuestion.query.filter_by(attempt_id=attempt_id).order_by(QuizAttemptQuestion.id).all()
@@ -662,7 +665,7 @@ def quiz(quiz_id):
 
     # Obtener la respuesta anterior si existe
     previous_response = UserQuiz.query.filter_by(
-        user_id=g.user.id,
+        user_id=current_user.id,
         quiz_id=quiz.id,
         attempt_id=attempt_id
     ).first()
@@ -683,7 +686,7 @@ def quiz(quiz_id):
         else:
             # Si no existe, crear una nueva respuesta
             user_quiz = UserQuiz(
-                user_id=g.user.id,
+                user_id=current_user.id,
                 quiz_id=quiz.id,
                 user_answer=user_answer,
                 user_score=user_score,
@@ -737,7 +740,7 @@ def start_quiz(resource_id, nivel_id, num_questions):
     selected_questions = random.sample(available_questions, min(num_questions, len(available_questions)))
 
     # Crear un nuevo intento de quiz
-    new_attempt = QuizAttempt(user_id=g.user.id)
+    new_attempt = QuizAttempt(user_id=current_user.id)
     db.session.add(new_attempt)
     db.session.commit()
 
@@ -760,10 +763,10 @@ def start_quiz(resource_id, nivel_id, num_questions):
     return redirect(url_for('icaro.quiz', attempt_id=new_attempt.id, quiz_id=first_quiz_id))
 
 # VER resultados de un intento de examen
-@bp.route('/quiz_results')
+@bp.route('/quiz_results/<int:attempt_id>')
 @login_required
-def quiz_results():
-    """Muestra la lista de intentos realizados por el usuario."""
+def quiz_results(attempt_id):
+    """Muestra los resultados del intento del usuario."""
     
     attempts = QuizAttempt.query.filter_by(user_id=g.user.id).order_by(QuizAttempt.created_at.desc()).all()
    
@@ -778,19 +781,13 @@ def quiz_results():
 def quiz_attempt(attempt_id):
     """Muestra los detalles de un intento específico, incluyendo preguntas y respuestas."""
 
-    attempt = QuizAttempt.query.filter_by(id=attempt_id, user_id=g.user.id).first() # Obtener el intento del usuario
+    attempt = QuizAttempt.query.get(attempt_id)
+
     if not attempt:
         flash("No se encontró el intento.", "danger")
-        return redirect(url_for('icaro.quiz_results'))
+        return redirect(url_for('icaro.quiz_setup'))
 
-    user_answers = UserQuiz.query.filter_by(attempt_id=attempt_id).all() # Obtener las respuestas del intento
-
-
-    return render_template(
-        'quiz/quiz_attempt.html',
-        attempt=attempt,
-        user_answers=user_answers
-    )
+    return render_template('quiz/quiz_results.html', attempt=attempt)
 
 # SELECCIONAR grupo, campo, recurso y nivel
 @bp.route('/quiz_setup', methods=['GET'])
@@ -816,17 +813,6 @@ def get_resources(field_id):
 def get_niveles(resource_id):
     niveles = Nivel.query.join(Quiz).filter(Quiz.resource_id == resource_id).distinct().all()
     return {'niveles': [{'id': n.id, 'name': n.nivel_name} for n in niveles]}
-
-# REQUIERE login
-from flask import (
-    Blueprint, render_template, request, redirect, url_for, flash, session, g,)
-from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User, Roll
-from flask_login import login_user, current_user
-from icaroapp import db
-import functools
-
-bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 # Consultas SQL

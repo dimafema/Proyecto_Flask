@@ -98,7 +98,7 @@ def login():
             session['username'] = user.username
             session['roll_id'] = user.roll_id
             flash('Usuario autenticado correctamente', 'success')
-            return redirect(url_for('icaro.index'))  
+            return redirect(url_for('index'))  
         else:
             flash('Usuario o contraseña incorrectos', 'danger') 
     return render_template('auth/login.html')

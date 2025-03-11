@@ -37,7 +37,7 @@ def create_app():
     # Registro de Blueprints con manejo de errores
     try:
         from . import icaro
-        app.register_blueprint(icaro.bp, name='icaro_bp')
+        app.register_blueprint(icaro.bp, name='icaro')
     except Exception as e:
         logging.error(f'Error al registrar Blueprint "icaro": {str(e)}')
 
@@ -49,7 +49,7 @@ def create_app():
         
     try:
         from . import admin
-        app.register_blueprint(admin.bp, name='admin_bp')
+        app.register_blueprint(admin.bp, name='admin')
     except Exception as e:
         logging.error(f'Error al registrar Blueprint "admin": {str(e)}')
 

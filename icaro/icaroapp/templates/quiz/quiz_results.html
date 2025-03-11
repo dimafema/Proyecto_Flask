@@ -1,30 +1,34 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Resultados de tus intentos</h2>
-    
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered text-center">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Intento</th>
-                    <th>Fecha</th>
-                    <th>Aciertos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for attempt in user_quizzes | groupby("attempt_id") %}
-                <tr>
-                    <td>{{ attempt.grouper }}</td>
-                    <td>{{ attempt.list[0].user_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                    <td>{{ attempt.list | sum(attribute='user_score') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+        <div class="container-fluid mt-5">
+            <h2 class="text-center mb-4">Resultados de tus intentos</h2>
+            
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Intento</th>
+                            <th>Fecha</th>
+                            <th>Aciertos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attempt_id, created_at, total_aciertos, total_preguntas in attempts %}
+                        {% set resultado_clase = 'table-danger' if total_aciertos < (total_preguntas / 2) else ('table-warning' if total_aciertos == (total_preguntas / 2) else 'table-success') %}
+                            <tr class="{{ resultado_clase }}" onclick="window.location='{{ url_for('icaro.quiz_attempt', attempt_id=attempt_id) }}'" style="cursor: pointer;">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>Aciertos: {{ total_aciertos }} de un total de {{ total_preguntas }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No hay intentos registrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
 {% endblock %}

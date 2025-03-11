@@ -6,7 +6,7 @@
     <section class="<div class="container-fluid">
         <nav class= "navbar">
              <h2>{% block title %} Lista de usuarios {%endblock%}</h2>
-             <a href="{{url_for('auth.register')}}" class="btn btn-success">Crear usuario</a>
+             <a href="{{url_for('auth_bp.register')}}" class="btn btn-success">Crear usuario</a>
     </section>
     
     <section class="row justify-content-center">
@@ -27,7 +27,7 @@
                             <td>{{ user.email }}</td>
                             <td>{{ user.roll_id }}</td>
                             <td>
-                                <a href="{{url_for('auth.edituser', id = user.id)}}" class="btn btn-info btn-sm">Editar</a>
+                                <a href="{{url_for('auth_bp.edituser', id = user.id)}}" class="btn btn-info btn-sm">Editar</a>
                             </td>
                             <td>
                                 <a href="{{url_for('admin.deleteuser', id = user.id)}}" class="btn btn-danger btn-sm">Eliminar</a>

@@ -5,7 +5,6 @@ from datetime import datetime
 from icaroapp import db
 from .models import Quiz, Group, Field, Resource, UserQuiz, Nivel, QuizAttempt, QuizAttemptQuestion
 import functools
-import logging
 import os
 import csv
 from io import BytesIO
@@ -22,7 +21,6 @@ from flask import Blueprint
 bp = Blueprint('icaro', __name__, url_prefix='/icaro'  )  
 
 # CREAR grupos, campos, recursos y niveles
-
 @bp.route('/creategroup', methods=('GET', 'POST'))
 @login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def creategroup():
@@ -137,7 +135,6 @@ def createnivel():
     return render_template('icaro/createnivel.html', resources=resources)
 
 # LISTAR grupos, campos, recursos y niveles
-
 @bp.route('/listgroups')
 @login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def listgroups():
@@ -181,7 +178,6 @@ def listquizzes():
     )
 
 # EDITAR grupos, campos, recursos y niveles
-
 @bp.route('/editgroup/<int:id>', methods=('GET', 'POST'))
 @login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def editgroup(id):
@@ -343,7 +339,6 @@ def editquiz(id):
     return render_template('quiz/editquiz.html',groups=groups, fields=fields, resources=resources, niveles=niveles, quiz=quiz)
 
 # ELIMINAR grupos, campos, recursos y niveles
-
 @bp.route('/deletegroup/<int:id>')
 @login_required(allowed_roles=[1])  # Solo Admins pueden acceder
 def deletegroup(id):
@@ -404,8 +399,6 @@ def deletequiz(id):
     db.session.commit()
     flash('Pregunta eliminada correctamente')
     return redirect(url_for('icaro.listquizzes'))
-
-# SUBIR preguntas, responder preguntas y ver resultados
 
 # Subir un archivo PDF y extraer preguntas
 @bp.route('/upload', methods=['POST'])
@@ -665,7 +658,7 @@ def quiz(quiz_id):
 
     # Obtener la respuesta anterior si existe
     previous_response = UserQuiz.query.filter_by(
-        user_id=current_user.id,
+        user_id=g.user.id,
         quiz_id=quiz.id,
         attempt_id=attempt_id
     ).first()
@@ -686,7 +679,7 @@ def quiz(quiz_id):
         else:
             # Si no existe, crear una nueva respuesta
             user_quiz = UserQuiz(
-                user_id=current_user.id,
+                user_id=g.user.id,
                 quiz_id=quiz.id,
                 user_answer=user_answer,
                 user_score=user_score,
@@ -740,7 +733,7 @@ def start_quiz(resource_id, nivel_id, num_questions):
     selected_questions = random.sample(available_questions, min(num_questions, len(available_questions)))
 
     # Crear un nuevo intento de quiz
-    new_attempt = QuizAttempt(user_id=current_user.id)
+    new_attempt = QuizAttempt(user_id=g.user.id)
     db.session.add(new_attempt)
     db.session.commit()
 
@@ -763,31 +756,45 @@ def start_quiz(resource_id, nivel_id, num_questions):
     return redirect(url_for('icaro.quiz', attempt_id=new_attempt.id, quiz_id=first_quiz_id))
 
 # VER resultados de un intento de examen
-@bp.route('/quiz_results/<int:attempt_id>')
+@bp.route('/quiz_results')
 @login_required
-def quiz_results(attempt_id):
-    """Muestra los resultados del intento del usuario."""
+def quiz_results():
+    """Muestra la lista de intentos realizados por el usuario autenticado, incluyendo aciertos."""
     
-    attempts = QuizAttempt.query.filter_by(user_id=g.user.id).order_by(QuizAttempt.created_at.desc()).all()
-   
-    return render_template(
-        'quiz/quiz_results.html', 
-        attempts=attempts
+    attempts = (
+        db.session.query(
+            QuizAttempt.id.label("attempt_id"),
+            QuizAttempt.created_at,
+            db.func.coalesce(db.func.sum(UserQuiz.user_score), 0).label("total_aciertos"),
+            db.func.count(UserQuiz.id).label("total_preguntas")
+        )
+        .outerjoin(UserQuiz, QuizAttempt.id == UserQuiz.attempt_id)
+        .filter(QuizAttempt.user_id == g.user.id)
+        .group_by(QuizAttempt.id, QuizAttempt.created_at)
+        .all()
     )
 
-# VER detalles de las preguntas de un intento de examen
+    return render_template('quiz/quiz_results.html', attempts=attempts)
+
 @bp.route('/quiz_attempt/<int:attempt_id>')
 @login_required
 def quiz_attempt(attempt_id):
-    """Muestra los detalles de un intento específico, incluyendo preguntas y respuestas."""
-
-    attempt = QuizAttempt.query.get(attempt_id)
+    """Muestra los detalles de un intento específico con preguntas y respuestas."""
+    attempt = QuizAttempt.query.filter_by(id=attempt_id, user_id=g.user.id).first()
 
     if not attempt:
         flash("No se encontró el intento.", "danger")
-        return redirect(url_for('icaro.quiz_setup'))
+        return redirect(url_for('icaro.quiz_results'))
 
-    return render_template('quiz/quiz_results.html', attempt=attempt)
+    # Obtener todas las preguntas del intento con respuestas del usuario
+    questions = (
+        db.session.query(Quiz, UserQuiz.user_answer, UserQuiz.user_score)
+        .join(UserQuiz, Quiz.id == UserQuiz.quiz_id)
+        .filter(UserQuiz.attempt_id == attempt_id, UserQuiz.user_id == g.user.id)
+        .all()
+    )
+
+    return render_template('quiz/quiz_attempt.html', attempt=attempt, questions=questions)
 
 # SELECCIONAR grupo, campo, recurso y nivel
 @bp.route('/quiz_setup', methods=['GET'])
@@ -819,7 +826,6 @@ def get_niveles(resource_id):
 def get_user(id):
     return User.query.get(id)  # Usa get() en lugar de filter_by().first()
 
-
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -831,7 +837,6 @@ def load_logged_in_user():
 
 
 # Vista de registro de usuarios
-
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -913,7 +918,6 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
 
 def login_required(allowed_roles=None):
     if allowed_roles is None:
